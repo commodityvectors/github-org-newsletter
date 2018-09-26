@@ -1,0 +1,11 @@
+{
+  "name": "github-org-newsletter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "graphql-client": "^2.0.1"
+  }
+}
