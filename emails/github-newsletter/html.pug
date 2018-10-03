@@ -1,0 +1,36 @@
+mixin repoList(repos)
+    each repo in repos
+        p
+            a(href=`${repo.url}`) #{repo.name}
+            small.badge(style={"background-color": repo.primaryLanguage ? repo.primaryLanguage.color : '#333'}) #{repo.primaryLanguage ? repo.primaryLanguage.name.toLowerCase() : 'none'}
+            if repo.isFork
+                small.badge(style={"background-color": '#333'}) fork
+        p #{repo.description || 'No description provided'}
+
+style(type='text/css').
+    .badge {
+        color: #ffffff;
+        padding: 5px;
+        margin-left: 5px;
+        border-radius: 5px;
+    }
+
+p Hi Genscape Nation!
+
+h2 Organization metrics
+
+p Total Members: #{totalMembers}
+p Total Private Repos: #{totalPrivateRepos}
+p Total Public Repos: #{totalPublicRepos}
+
+h2 Recently updated
++repoList(recentlyUpdatedRepos)
+
+h2 Trending
++repoList(mostStarredRepos)
+
+h2 Recently created private
++repoList(privateRepos)
+
+h2 Recently created public
++repoList(publicRepos)

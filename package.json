@@ -6,6 +6,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "graphql-client": "^2.0.1"
+    "email-templates": "^5.0.0",
+    "graphql-client": "^2.0.1",
+    "pug": "^2.0.3"
   }
 }
