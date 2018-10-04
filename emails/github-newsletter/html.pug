@@ -1,21 +1,42 @@
 mixin repoList(repos)
     each repo in repos
-        p
-            a(href=`${repo.url}`) #{repo.name}
-            small.badge(style={"border-color": '#9e9e9e', color: '#333'}) #{new Date(repo.createdAt).toLocaleString("en-US", { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
-        small #{repo.description || 'No description provided'}
-        p
-            small.badge(style={"background-color": repo.primaryLanguage ? repo.primaryLanguage.color : '#333'}) #{repo.primaryLanguage ? repo.primaryLanguage.name.toLowerCase() : 'none'}
-            if repo.isFork
-                small.badge(style={"background-color": '#333'}) fork
+        div.repo
+            p
+                a(href=`${repo.url}`) #{repo.name}
+                small.badge(style={"background-color": repo.primaryLanguage ? repo.primaryLanguage.color : '#333'}) #{repo.primaryLanguage ? repo.primaryLanguage.name.toLowerCase() : 'none'}
+                if repo.isFork
+                    small.badge(style={"background-color": '#333'}) fork
+            p
+                small #{repo.description || 'No description provided'}
+            p
+                if repo.pushedAt
+                    small updated at #{new Date(repo.pushedAt).toLocaleString("en-US", { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
+                else
+                    small no updated date
 
 mixin indicator(label, value)
     div(style={"text-align": "center"})
-        h2 #{value}
+        h3 #{value}
         small #{label}
 
 style(type='text/css').
     @import url('https://fonts.googleapis.com/css?family=Roboto');
+
+    .repo {
+        margin-bottom: 10px;
+        border-left: 5px solid #e2e2e2;
+        padding: 5px;
+        background: #fafafa;
+    }
+
+    .repo > p {
+        margin: 0;
+        padding: 0;
+    }
+
+    .repo > p:not(:last-child) {
+        margin-bottom: 5px;
+    }
 
     body {
          font-family: 'Arial', sans-serif;
@@ -28,33 +49,41 @@ style(type='text/css').
 
     .badge {
         color: #ffffff;
-        padding: 3px 5px;
+        padding: 3px 3px;
         border-radius: 5px;
     }
     .badge:not(:first-child) {
         margin-left: 5px;
     }
 
+    h2 {
+        text-decoration: underline;
+    }
+
+    .metrics > {
+        display: inline-block;
+    }
+    .metrics > :not(:first-child) {
+        margin-left: 20px;
+    }
+
 
 body
-    div(style={display: 'flex', 'justify-content': 'space-around'})
-        img(src=`${avatarUrl}`)
-        +indicator("Members", totalMembers)
-        +indicator("Private Repos", totalPrivateRepos)
-        +indicator("Public Repos", totalPublicRepos)
+    div(style={'min-width': '300px','max-width': '600px'})
+        div.metrics
+            img(src=`${avatarUrl}`)
+            +indicator("Members", totalMembers)
+            +indicator("Private Repos", totalPrivateRepos)
+            +indicator("Public Repos", totalPublicRepos)
 
-    //p Total Members: #{totalMembers}
-    //p Total Private Repos: #{totalPrivateRepos}
-    //p Total Public Repos: #{totalPublicRepos}
+        h2 Updates
+        +repoList(recentlyUpdatedRepos)
 
-    h2 Recently updated
-    +repoList(recentlyUpdatedRepos)
+        h2 Trending
+        +repoList(mostStarredRepos)
 
-    h2 Trending
-    +repoList(mostStarredRepos)
+        h2 Newest private
+        +repoList(privateRepos)
 
-    h2 Recently created private
-    +repoList(privateRepos)
-
-    h2 Recently created public
-    +repoList(publicRepos)
+        h2 Newest public
+        +repoList(publicRepos)

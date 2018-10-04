@@ -1,13 +1,24 @@
 const Email = require('email-templates');
+const nodemailer = require('nodemailer');
+
+let smtpConfig = {
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // upgrade later with STARTTLS
+    auth: {
+        user: 'noreply@commodityvectors.com',
+        pass: ''
+    }
+};
+
+let transporter = nodemailer.createTransport(smtpConfig);
 
 const email = new Email({
     message: {
         from: 'noreply@commodityvectors.com'
     },
     send: true,
-    transport: {
-        jsonTransport: true
-    }
+    transport: transporter
 });
 
 const client = require('graphql-client')({
@@ -114,7 +125,7 @@ query orgData($org: String!) {
     const totalPublicRepos = res.data.organization.publicRepos.totalCount;
 
     const template = 'github-newsletter';
-    const message = { to: 'rafael@commodityvectors.com' };
+    const message = { bcc: [] };
     const locals = {
         avatarUrl,
         org,
@@ -127,5 +138,5 @@ query orgData($org: String!) {
         mostStarredRepos
     };
 
-    return email.send({ template, message, locals });
-});
+    return email.send({ template, message, locals, send: false });
+}).catch(console.error.bind(console));
