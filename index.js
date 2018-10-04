@@ -37,6 +37,7 @@ query orgData($org: String!) {
         name
         url
         description
+        pushedAt
         primaryLanguage {
           id
           color
@@ -49,6 +50,7 @@ query orgData($org: String!) {
       nodes {
         id
         isFork
+        pushedAt
         description
         createdAt
         isPrivate
@@ -66,6 +68,7 @@ query orgData($org: String!) {
       nodes {
         id
         isFork
+        pushedAt
         createdAt
         isPrivate
         name
@@ -84,6 +87,7 @@ query orgData($org: String!) {
         id
         isFork
         createdAt
+        pushedAt
         isPrivate
         name
         url
@@ -99,6 +103,7 @@ query orgData($org: String!) {
   }
 }
 `, { org }).then(res => {
+    const avatarUrl = res.data.organization.avatarUrl;
     const totalMembers = res.data.organization.members.totalCount;
 
     const publicRepos = res.data.organization.publicRepos.nodes;
@@ -111,7 +116,15 @@ query orgData($org: String!) {
     const template = 'github-newsletter';
     const message = { to: 'rafael@commodityvectors.com' };
     const locals = {
-        org, totalMembers, totalPrivateRepos, totalPublicRepos, publicRepos, privateRepos, recentlyUpdatedRepos, mostStarredRepos
+        avatarUrl,
+        org,
+        totalMembers,
+        totalPrivateRepos,
+        totalPublicRepos,
+        publicRepos,
+        privateRepos,
+        recentlyUpdatedRepos,
+        mostStarredRepos
     };
 
     return email.send({ template, message, locals });
