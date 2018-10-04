@@ -26,3 +26,7 @@ docker run \
   -e GITHUB_ORG=yourgithubork \
   commodityvectors/github-org-newsletter:0.1.0 
 ```
+
+## Example email
+
+![screen shot of an example email](ss.png)
