@@ -3,7 +3,9 @@ mixin repoList(repos)
         div.repo
             p
                 a(href=`${repo.url}`) #{repo.name}
-                small.badge(style={"background-color": repo.primaryLanguage ? repo.primaryLanguage.color : '#333'}) #{repo.primaryLanguage ? repo.primaryLanguage.name.toLowerCase() : 'none'}
+                small.badge(style={"background-color": '#333'}) #{repo.stargazers.totalCount.toLocaleString("en-US")} ☆
+                if repo.primaryLanguage
+                    small.badge(style={"background-color": repo.primaryLanguage.color}) #{repo.primaryLanguage.name.toLowerCase()}
                 if repo.isFork
                     small.badge(style={"background-color": '#333'}) fork
             p
@@ -12,11 +14,11 @@ mixin repoList(repos)
                 if repo.pushedAt
                     small updated at #{new Date(repo.pushedAt).toLocaleString("en-US", { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
                 else
-                    small no updated date
+                    small created at #{new Date(repo.createdAt).toLocaleString("en-US", { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
 
 mixin indicator(label, value)
     div(style={"text-align": "center"})
-        h3 #{value}
+        h3 #{value.toLocaleString("en-US")}
         small #{label}
 
 style(type='text/css').
@@ -59,6 +61,10 @@ style(type='text/css').
     h2 {
         text-decoration: underline;
     }
+    
+    .metrics {
+        text-align: center;
+    }
 
     .metrics > {
         display: inline-block;
@@ -67,20 +73,24 @@ style(type='text/css').
         margin-left: 20px;
     }
 
+    .metrics small {
+        border-bottom: 2px solid purple;
+    }
+
 
 body
     div(style={'min-width': '300px','max-width': '600px'})
         div.metrics
-            img(src=`${avatarUrl}`)
+            //img(src=`${avatarUrl}`)
             +indicator("Members", totalMembers)
             +indicator("Private Repos", totalPrivateRepos)
             +indicator("Public Repos", totalPublicRepos)
 
-        h2 Updates
-        +repoList(recentlyUpdatedRepos)
-
         h2 Trending
         +repoList(mostStarredRepos)
+
+        h2 Updates
+        +repoList(recentlyUpdatedRepos)
 
         h2 Newest private
         +repoList(privateRepos)

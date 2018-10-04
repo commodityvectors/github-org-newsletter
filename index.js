@@ -1,21 +1,27 @@
 const Email = require('email-templates');
 const nodemailer = require('nodemailer');
 
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config()
+}
+
 let smtpConfig = {
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // upgrade later with STARTTLS
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: process.env.SMTP_SECURE !== undefined,
     auth: {
-        user: 'noreply@commodityvectors.com',
-        pass: ''
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD
     }
 };
+
+const to = process.env.EMAIL_TO.split(',');
 
 let transporter = nodemailer.createTransport(smtpConfig);
 
 const email = new Email({
     message: {
-        from: 'noreply@commodityvectors.com'
+        from: process.env.EMAIL_FROM
     },
     send: true,
     transport: transporter
@@ -28,7 +34,7 @@ const client = require('graphql-client')({
     }
 });
 
-const org = "commodityvectors";
+const org = process.env.GITHUB_ORG;
 
 client.query(`
 query orgData($org: String!) {
@@ -39,7 +45,7 @@ query orgData($org: String!) {
     members(first: 0) {
       totalCount
     }
-    mostStarred: repositories(first: 3, orderBy: {field: STARGAZERS, direction: DESC}) {
+    mostStarred: repositories(first: 3, orderBy: {field: STARGAZERS, direction: DESC}, isFork: false) {
       nodes {
         id
         isFork
@@ -49,6 +55,9 @@ query orgData($org: String!) {
         url
         description
         pushedAt
+        stargazers {
+          totalCount
+        }
         primaryLanguage {
           id
           color
@@ -57,7 +66,7 @@ query orgData($org: String!) {
       }
       totalCount
     }
-    recentlyPushed: repositories(first: 5, orderBy: {field: PUSHED_AT, direction: DESC}) {
+    recentlyPushed: repositories(first: 5, orderBy: {field: PUSHED_AT, direction: DESC}, isFork: false) {
       nodes {
         id
         isFork
@@ -67,6 +76,9 @@ query orgData($org: String!) {
         isPrivate
         name
         url
+        stargazers {
+          totalCount
+        }
         primaryLanguage {
           id
           color
@@ -75,7 +87,7 @@ query orgData($org: String!) {
       }
       totalCount
     }
-    publicRepos: repositories(first: 5, orderBy: {field: CREATED_AT, direction: DESC}, privacy: PUBLIC) {
+    publicRepos: repositories(first: 5, orderBy: {field: CREATED_AT, direction: DESC}, privacy: PUBLIC, isFork: false) {
       nodes {
         id
         isFork
@@ -85,6 +97,9 @@ query orgData($org: String!) {
         name
         url
         description
+        stargazers {
+          totalCount
+        }
         primaryLanguage {
           id
           color
@@ -93,7 +108,7 @@ query orgData($org: String!) {
       }
       totalCount
     }
-    privateRepos: repositories(first: 5, orderBy: {field: CREATED_AT, direction: DESC}, privacy: PRIVATE) {
+    privateRepos: repositories(first: 5, orderBy: {field: CREATED_AT, direction: DESC}, privacy: PRIVATE, isFork: false) {
       nodes {
         id
         isFork
@@ -103,6 +118,9 @@ query orgData($org: String!) {
         name
         url
         description
+        stargazers {
+          totalCount
+        }
         primaryLanguage {
           id
           color
@@ -125,7 +143,7 @@ query orgData($org: String!) {
     const totalPublicRepos = res.data.organization.publicRepos.totalCount;
 
     const template = 'github-newsletter';
-    const message = { bcc: [] };
+    const message = { bcc: to };
     const locals = {
         avatarUrl,
         org,
